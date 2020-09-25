@@ -10,12 +10,15 @@
 import argparse
 import configparser
 import hashlib
+import pprint
 
 import requests
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-b", "--breach", help="Getting all breaches for an account.")
+parser.add_argument("-a", "--allbreaches", action="store_true", help="Getting all breached sites in the system.")
+parser.add_argument("-d", "--dataclasses", action="store_true", help="Getting all data classes in the system.")
 parser.add_argument("-p", "--paste", help="Getting all pastes for an account.")
 parser.add_argument("-w", "--watchword", help="Searching by range.")
 args = parser.parse_args()
@@ -29,11 +32,12 @@ class HaveIBeenPwned:
     def __init__(self):
         self.baseUrl1 = "https://haveibeenpwned.com/api/v3"
         self.baseUrl2 = "https://api.pwnedpasswords.com"
-        self.headers = {}
-        self.headers["content-type"] = "application/json"
-        self.headers["api-version"] = "3"
-        self.headers["User-Agent"] = "the-monkey-playground-script"
-        self.headers["hibp-api-key"] = config["Api"]["key"]
+        self.headers = {
+            "content-type": "application/json",
+            "api-version": "3",
+            "User-Agent": "the-monkey-playground-script",
+            "hibp-api-key": config["Api"]["key"],
+        }
 
     def breachesAnAccount(self, account):
         apiUrl = "{}/breachedaccount/{}?truncateResponse=false".format(
@@ -63,6 +67,35 @@ class HaveIBeenPwned:
         elif resp.status_code == 404:
             print("==================================================")
             print("[*] Info; {} not found in a breach".format(account))
+
+    def allBreachedSites(self):
+        apiUrl = "{}/breaches".format(self.baseUrl1)
+        resp = requests.get(apiUrl, headers=self.headers)
+        if resp.status_code == 200:
+            for data in resp.json():
+                print("=========================")
+                print("  - Name        : {}".format(data["Name"]))
+                print("  - Title       : {}".format(data["Title"]))
+                print("  - Domain      : {}".format(data["Domain"]))
+                print("  - BreachDate  : {}".format(data["BreachDate"]))
+                print("  - AddedDate   : {}".format(data["AddedDate"]))
+                print("  - ModifiedDate: {}".format(data["ModifiedDate"]))
+                print("  - PwnCount    : {}".format(data["PwnCount"]))
+                print("  - Description :\n{}".format(data["Description"]))
+                print("  - DataClasses : {}".format(", ".join(data["DataClasses"])))
+                print("  - IsVerified  : {}".format(data["IsVerified"]))
+                print("  - IsFabricated: {}".format(data["IsFabricated"]))
+                print("  - IsSensitive : {}".format(data["IsSensitive"]))
+                print("  - IsRetired   : {}".format(data["IsRetired"]))
+                print("  - IsSpamList  : {}".format(data["IsSpamList"]))
+                print("  - LogoPath    : {}".format(data["LogoPath"]))
+
+    def allDataClasses(self):
+        apiUrl = "{}/dataclasses".format(self.baseUrl1)
+        resp = requests.get(apiUrl, headers=self.headers)
+        if resp.status_code == 200:
+            for data in resp.json():
+                print("  - {}".format(data))
 
     def pastesAnAccount(self, account):
         apiUrl = "{}/pasteaccount/{}".format(self.baseUrl1, account)
@@ -95,11 +128,18 @@ class HaveIBeenPwned:
             if not matchFlag:
                 print("[*] Info; {} not found in a breach".format(password))
 
+
 if __name__ == "__main__":
     classhibp = HaveIBeenPwned()
 
     if args.breach is not None:
         classhibp.breachesAnAccount(args.breach)
+
+    if args.allbreaches:
+        classhibp.allBreachedSites()
+
+    if args.dataclasses:
+        classhibp.allDataClasses()
 
     if args.paste is not None:
         classhibp.pastesAnAccount(args.paste)
