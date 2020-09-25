@@ -10,6 +10,7 @@
 import argparse
 import configparser
 import hashlib
+
 import requests
 
 
@@ -93,7 +94,6 @@ class HaveIBeenPwned:
                     matchFlag = True
             if not matchFlag:
                 print("[*] Info; {} not found in a breach".format(password))
-
 
 if __name__ == "__main__":
     classhibp = HaveIBeenPwned()
