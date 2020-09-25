@@ -5,7 +5,7 @@ To execute this script, the following modules are required.
 - configparser
 - Hashlib
 - argparse
-- The requirements
+- requests
 
 Please install the requests module separately by the following command
 "pip install requests"
