@@ -20,6 +20,6 @@ optional arguments:<br>
 -w WATCHWORD, --watchword WATCHWORD{Password} Searching by range.<br>
 
 # Reference Information
-https://haveibeenpwned.com
-https://haveibeenpwned.com/API/v3
-https://haveibeenpwned.com/API/Key
+https://haveibeenpwned.com<br>
+https://haveibeenpwned.com/API/v3<br>
+https://haveibeenpwned.com/API/Key<br>
