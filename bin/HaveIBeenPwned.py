@@ -10,15 +10,25 @@
 import argparse
 import configparser
 import hashlib
-import pprint
 
 import requests
 
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-b", "--breach", help="Getting all breaches for an account.")
-parser.add_argument("-a", "--allbreaches", action="store_true", help="Getting all breached sites in the system.")
-parser.add_argument("-d", "--dataclasses", action="store_true", help="Getting all data classes in the system.")
+parser.add_argument(
+    "-a",
+    "--allbreaches",
+    action="store_true",
+    help="Getting all breached sites in the system.",
+)
+parser.add_argument("-s", "--site", help="Getting a single breached site.")
+parser.add_argument(
+    "-d",
+    "--dataclasses",
+    action="store_true",
+    help="Getting all data classes in the system.",
+)
 parser.add_argument("-p", "--paste", help="Getting all pastes for an account.")
 parser.add_argument("-w", "--watchword", help="Searching by range.")
 args = parser.parse_args()
@@ -90,6 +100,30 @@ class HaveIBeenPwned:
                 print("  - IsSpamList  : {}".format(data["IsSpamList"]))
                 print("  - LogoPath    : {}".format(data["LogoPath"]))
 
+    def singleBreachedSites(self, name):
+        apiUrl = "{}/breach/{}".format(self.baseUrl1, name,)
+        resp = requests.get(apiUrl, headers=self.headers)
+        if resp.status_code == 200:
+            print("==================================================")
+            print("  - Name        : {}".format(resp.json()["Name"]))
+            print("  - Title       : {}".format(resp.json()["Title"]))
+            print("  - Domain      : {}".format(resp.json()["Domain"]))
+            print("  - BreachDate  : {}".format(resp.json()["BreachDate"]))
+            print("  - AddedDate   : {}".format(resp.json()["AddedDate"]))
+            print("  - ModifiedDate: {}".format(resp.json()["ModifiedDate"]))
+            print("  - PwnCount    : {}".format(resp.json()["PwnCount"]))
+            print("  - Description :\n{}".format(resp.json()["Description"]))
+            print("  - DataClasses : {}".format(", ".join(resp.json()["DataClasses"])))
+            print("  - IsVerified  : {}".format(resp.json()["IsVerified"]))
+            print("  - IsFabricated: {}".format(resp.json()["IsFabricated"]))
+            print("  - IsSensitive : {}".format(resp.json()["IsSensitive"]))
+            print("  - IsRetired   : {}".format(resp.json()["IsRetired"]))
+            print("  - IsSpamList  : {}".format(resp.json()["IsSpamList"]))
+            print("  - LogoPath    : {}".format(resp.json()["LogoPath"]))
+        elif resp.status_code == 404:
+            print("==================================================")
+            print("[*] Info; {} not found in a breach".format(name))
+
     def allDataClasses(self):
         apiUrl = "{}/dataclasses".format(self.baseUrl1)
         resp = requests.get(apiUrl, headers=self.headers)
@@ -137,6 +171,9 @@ if __name__ == "__main__":
 
     if args.allbreaches:
         classhibp.allBreachedSites()
+
+    if args.site is not None:
+        classhibp.singleBreachedSites(args.site)
 
     if args.dataclasses:
         classhibp.allDataClasses()
