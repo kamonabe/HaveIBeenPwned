@@ -18,3 +18,8 @@ optional arguments:<br>
 -b BREACH, --breach BREACH{MailAddress} Getting all breaches for an account.<br>
 -p PASTE, --paste PASTE{MailAddress} Getting all pastes for an account.<br>
 -w WATCHWORD, --watchword WATCHWORD{Password} Searching by range.<br>
+
+# Reference Information
+https://haveibeenpwned.com
+https://haveibeenpwned.com/API/v3
+https://haveibeenpwned.com/API/Key
