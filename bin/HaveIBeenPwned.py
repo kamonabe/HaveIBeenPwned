@@ -2,7 +2,7 @@
 #
 #  author       : Kamonabe
 #  First edition: Sep 25, 2019
-#  Last Update  : Sep 25, 2019
+#  Last Update  : Sep 26, 2019
 #
 #  Free to use
 #  Free to modify
@@ -40,8 +40,8 @@ config.read("/usr/local/hibp/etc/hibp.ini")
 
 class HaveIBeenPwned:
     def __init__(self):
-        self.baseUrl1 = "https://haveibeenpwned.com/api/v3"
-        self.baseUrl2 = "https://api.pwnedpasswords.com"
+        self.base_url1 = "https://haveibeenpwned.com/api/v3"
+        self.base_url2 = "https://api.pwnedpasswords.com"
         self.headers = {
             "content-type": "application/json",
             "api-version": "3",
@@ -49,11 +49,11 @@ class HaveIBeenPwned:
             "hibp-api-key": config["Api"]["key"],
         }
 
-    def breachesAnAccount(self, account):
-        apiUrl = "{}/breachedaccount/{}?truncateResponse=false".format(
-            self.baseUrl1, account
+    def breaches_an_account(self, account):
+        api_url = "{}/breachedaccount/{}?truncateResponse=false".format(
+            self.base_url1, account
         )
-        resp = requests.get(apiUrl, headers=self.headers)
+        resp = requests.get(api_url, headers=self.headers)
         if resp.status_code == 200:
             print("==================================================")
             print("[*] Warning; Breach Check for: {}".format(account))
@@ -78,9 +78,9 @@ class HaveIBeenPwned:
             print("==================================================")
             print("[*] Info; {} not found in a breach".format(account))
 
-    def allBreachedSites(self):
-        apiUrl = "{}/breaches".format(self.baseUrl1)
-        resp = requests.get(apiUrl, headers=self.headers)
+    def all_breached_sites(self):
+        api_url = "{}/breaches".format(self.base_url1)
+        resp = requests.get(api_url, headers=self.headers)
         if resp.status_code == 200:
             for data in resp.json():
                 print("=========================")
@@ -100,9 +100,9 @@ class HaveIBeenPwned:
                 print("  - IsSpamList  : {}".format(data["IsSpamList"]))
                 print("  - LogoPath    : {}".format(data["LogoPath"]))
 
-    def singleBreachedSites(self, name):
-        apiUrl = "{}/breach/{}".format(self.baseUrl1, name,)
-        resp = requests.get(apiUrl, headers=self.headers)
+    def single_breached_sites(self, name):
+        api_url = "{}/breach/{}".format(self.base_url1, name,)
+        resp = requests.get(api_url, headers=self.headers)
         if resp.status_code == 200:
             print("==================================================")
             print("  - Name        : {}".format(resp.json()["Name"]))
@@ -124,16 +124,16 @@ class HaveIBeenPwned:
             print("==================================================")
             print("[*] Info; {} not found in a breach".format(name))
 
-    def allDataClasses(self):
-        apiUrl = "{}/dataclasses".format(self.baseUrl1)
-        resp = requests.get(apiUrl, headers=self.headers)
+    def all_data_classes(self):
+        api_url = "{}/dataclasses".format(self.base_url1)
+        resp = requests.get(api_url, headers=self.headers)
         if resp.status_code == 200:
             for data in resp.json():
                 print("  - {}".format(data))
 
-    def pastesAnAccount(self, account):
-        apiUrl = "{}/pasteaccount/{}".format(self.baseUrl1, account)
-        resp = requests.get(apiUrl, headers=self.headers)
+    def pastes_an_account(self, account):
+        api_url = "{}/pasteaccount/{}".format(self.base_url1, account)
+        resp = requests.get(api_url, headers=self.headers)
         if resp.status_code == 200:
             print("==================================================")
             print("[*] Warning; Breach Check for: {}".format(account))
@@ -148,18 +148,18 @@ class HaveIBeenPwned:
             print("==================================================")
             print("[*] Info; {} not found in a breach".format(account))
 
-    def searchingByRange(self, password):
-        hashchars = hashlib.sha1(password.encode("utf-8")).hexdigest().upper()
-        apiUrl = "{}/range/{}".format(self.baseUrl2, hashchars[:5])
-        resp = requests.get(apiUrl, headers=self.headers)
+    def searching_by_range(self, password):
+        hash_chars = hashlib.sha1(password.encode("utf-8")).hexdigest().upper()
+        api_url = "{}/range/{}".format(self.base_url2, hash_chars[:5])
+        resp = requests.get(api_url, headers=self.headers)
         if resp.status_code == 200:
             print("==================================================")
-            matchFlag = False
+            match_flag = False
             for item in resp.text.splitlines():
-                if item[0:35] == hashchars[5:]:
+                if item[0:35] == hash_chars[5:]:
                     print("[*] Warning; {}; {}".format(password, item[36:]))
-                    matchFlag = True
-            if not matchFlag:
+                    match_flag = True
+            if not match_flag:
                 print("[*] Info; {} not found in a breach".format(password))
 
 
@@ -167,19 +167,19 @@ if __name__ == "__main__":
     classhibp = HaveIBeenPwned()
 
     if args.breach is not None:
-        classhibp.breachesAnAccount(args.breach)
+        classhibp.breaches_an_account(args.breach)
 
     if args.allbreaches:
-        classhibp.allBreachedSites()
+        classhibp.all_breached_sites()
 
     if args.site is not None:
-        classhibp.singleBreachedSites(args.site)
+        classhibp.single_breached_sites(args.site)
 
     if args.dataclasses:
-        classhibp.allDataClasses()
+        classhibp.all_data_classes()
 
     if args.paste is not None:
-        classhibp.pastesAnAccount(args.paste)
+        classhibp.pastes_an_account(args.paste)
 
     if args.watchword is not None:
-        classhibp.searchingByRange(args.watchword)
+        classhibp.searching_by_range(args.watchword)
